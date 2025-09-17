@@ -1,0 +1,88 @@
+krnl.lua -- Mango Hub UI with Link Button
+-- Replace the URL with your script link
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+-- Main GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "MangoHub"
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Panel
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0.6,0,0.65,0)
+panel.Position = UDim2.new(0.2,0,-1,0) -- hidden at start
+panel.BackgroundColor3 = Color3.fromRGB(255,185,77) -- mango orange
+panel.Parent = gui
+local pc = Instance.new("UICorner", panel); pc.CornerRadius = UDim.new(0,12)
+
+-- Title
+local title = Instance.new("TextLabel", panel)
+title.Size = UDim2.new(1,0,0,40)
+title.BackgroundTransparency = 1
+title.Text = "Mango Hub"
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 24
+title.TextColor3 = Color3.fromRGB(30,30,30)
+
+-- Close Button
+local closeBtn = Instance.new("TextButton", panel)
+closeBtn.Size = UDim2.new(0,50,0,28)
+closeBtn.Position = UDim2.new(1,-60,0,6)
+closeBtn.Text = "✕"
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 18
+closeBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+local cc = Instance.new("UICorner", closeBtn); cc.CornerRadius = UDim.new(0,6)
+
+-- Mango Button (toggle)
+local mangoBtn = Instance.new("ImageButton", gui)
+mangoBtn.Size = UDim2.new(0,96,0,96)
+mangoBtn.Position = UDim2.new(0.05,0,0.82,0)
+mangoBtn.BackgroundTransparency = 1
+mangoBtn.Image = "rbxassetid://7078349920" -- replace with your mango image ID
+local mc = Instance.new("UICorner", mangoBtn); mc.CornerRadius = UDim.new(1,0)
+
+-- Link Button
+local linkBtn = Instance.new("TextButton", panel)
+linkBtn.Size = UDim2.new(0.8,0,0,40)
+linkBtn.Position = UDim2.new(0.1,0,0,60)
+linkBtn.Text = "Open Mango Script"
+linkBtn.Font = Enum.Font.SourceSans
+linkBtn.TextSize = 18
+linkBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+linkBtn.TextColor3 = Color3.fromRGB(30,30,30)
+local lc = Instance.new("UICorner", linkBtn); lc.CornerRadius = UDim.new(0,6)
+
+-- URL to open
+local linkURL = "https://github.com/appleeatet7/themango-mangler-hub/raw/main/Krnl%20Mango%20Hub%20UI%20Script.lua"
+
+linkBtn.MouseButton1Click:Connect(function()
+	local success,err = pcall(function()
+		player:PromptOpenURL(linkURL)
+	end)
+	if not success then warn("Could not open URL:",err) end
+end)
+
+-- Toggle Animation
+local open = false
+local busy = false
+local function show()
+	if busy then return end
+	busy = true
+	TweenService:Create(panel,TweenInfo.new(0.4,Enum.EasingStyle.Back,Enum.EasingDirection.Out),
+		{Position=UDim2.new(0.2,0,0.18,0)}):Play()
+	task.delay(0.4,function() open=true; busy=false end)
+end
+local function hide()
+	if busy then return end
+	busy = true
+	TweenService:Create(panel,TweenInfo.new(0.3,Enum.EasingStyle.Quad,Enum.EasingDirection.In),
+		{Position=UDim2.new(0.2,0,-1,0)}):Play()
+	task.delay(0.3,function() open=false; busy=false end)
+end
+
+mangoBtn.MouseButton1Click:Connect(function() if open then hide() else show() end end)
+closeBtn.MouseButton1Click:Connect(hide)

